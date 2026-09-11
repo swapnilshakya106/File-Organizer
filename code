@@ -1,0 +1,85 @@
+"""
+File Organizer
+----------------
+A simple command-line tool that scans a folder and automatically
+sorts files into subfolders based on their file type (extension).
+
+Example:
+    Before:
+        Downloads/
+            photo.jpg
+            resume.pdf
+            song.mp3
+            notes.txt
+
+    After running this script on "Downloads/":
+        Downloads/
+            Images/photo.jpg
+            Documents/resume.pdf
+            Music/song.mp3
+            Text Files/notes.txt
+"""
+
+import os
+import shutil
+
+# Map file extensions to the folder name they should go into.
+# Extend this dictionary anytime to support more file types.
+FILE_TYPES = {
+    "Images": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"],
+    "Documents": [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"],
+    "Text Files": [".txt", ".md", ".csv"],
+    "Music": [".mp3", ".wav", ".m4a"],
+    "Videos": [".mp4", ".mkv", ".mov", ".avi"],
+    "Archives": [".zip", ".rar", ".7z", ".tar", ".gz"],
+    "Code": [".py", ".js", ".html", ".css", ".java", ".cpp"],
+}
+
+
+def get_category(extension):
+    """Return the folder name a given file extension belongs to."""
+    for category, extensions in FILE_TYPES.items():
+        if extension.lower() in extensions:
+            return category
+    return "Others"
+
+
+def organize_folder(folder_path):
+    """Sort every file in folder_path into category subfolders."""
+    if not os.path.isdir(folder_path):
+        print(f"Error: '{folder_path}' is not a valid folder.")
+        return
+
+    moved_count = 0
+
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+
+        # Skip subfolders — only sort files sitting directly in this folder
+        if os.path.isdir(file_path):
+            continue
+
+        _, extension = os.path.splitext(filename)
+        if extension == "":
+            continue  # skip files with no extension
+
+        category = get_category(extension)
+        category_folder = os.path.join(folder_path, category)
+
+        # Create the category folder if it doesn't exist yet
+        os.makedirs(category_folder, exist_ok=True)
+
+        destination = os.path.join(category_folder, filename)
+        shutil.move(file_path, destination)
+        print(f"Moved: {filename}  ->  {category}/")
+        moved_count += 1
+
+    if moved_count == 0:
+        print("No files to organize. Folder is already clean!")
+    else:
+        print(f"\nDone! Organized {moved_count} file(s).")
+
+
+if __name__ == "__main__":
+    target_folder = input("Enter the full path of the folder to organize: ").strip()
+    organize_folder(target_folder)
