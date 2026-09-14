@@ -59,25 +59,7 @@ def organize_folder(folder_path):
         if os.path.isdir(file_path):
             continue
 
-        _, extension = os.path.splitext(filename)
-        if extension == "":
-            continue  # skip files with no extension
-
-        category = get_category(extension)
-        category_folder = os.path.join(folder_path, category)
-
-        # Create the category folder if it doesn't exist yet
-        os.makedirs(category_folder, exist_ok=True)
-
-        destination = os.path.join(category_folder, filename)
-        shutil.move(file_path, destination)
-        print(f"Moved: {filename}  ->  {category}/")
-        moved_count += 1
-
-    if moved_count == 0:
-        print("No files to organize. Folder is already clean!")
-    else:
-        print(f"\nDone! Organized {moved_count} file(s).")
+      
 
 
 if __name__ == "__main__":
